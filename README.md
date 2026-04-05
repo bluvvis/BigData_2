@@ -36,5 +36,5 @@ See `app/README.md` for per-file notes.
 ## Report
 
 - Source: `report/report.tex` (set your name; adjust reflection if needed).
-- Screenshots in `report/figures/` as: `fig01_services_hdfs`, `fig02_prepare_data`, `fig03_mapreduce`, `fig04_cassandra_load`, `fig05_search_query1`, `fig06_search_query2`, `fig07_yarn_or_spark_ui`, `fig08_pipeline_complete` (`.png` or `.pdf`). Copy from e.g. `~/Desktop/bd_screens` and rename to match.
+- Screenshots in `report/figures/` as `fig01_services_hdfs.png` … `fig08_pipeline_complete.png` (or `.pdf`). Missing files show as placeholders in the PDF. Quick map from `~/Desktop/bd_screens`: `docker_start.png` → `fig01_services_hdfs.png`; `HFDS.png` → `fig02_prepare_data.png`; `search_results_of_deeplearning.png` → `fig05_search_query1.png`; `completed_pipeline.png` → `fig08_pipeline_complete.png`.
 - Build: `cd report && pdflatex report.tex`, or upload `report.tex` + `figures/` to Overleaf. Submit `report.pdf` per course requirements.

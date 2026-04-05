@@ -9,6 +9,11 @@
 \usepackage{booktabs}
 \geometry{margin=2.5cm}
 \graphicspath{{figures/}}
+
+\newcommand{\figortext}[3]{%
+  \IfFileExists{figures/#1.png}{\includegraphics[width=0.95\textwidth]{#1}}{%
+    \IfFileExists{figures/#1.pdf}{\includegraphics[width=0.95\textwidth]{#1}}{%
+      \fbox{\parbox{0.9\textwidth}{\centering\vspace{2.2cm}\textit{#2}\\[0.5em]\small\texttt{#3}\vspace{2.2cm}}}}}}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
 \title{Assignment 2: Simple Search Engine\\MapReduce, Cassandra, and Spark}
@@ -62,54 +67,56 @@ The grader-facing search logic uses the Cassandra driver for I/O; a minimal Spar
 Place \texttt{a.parquet} in \texttt{app/}. From the repository root run \texttt{docker compose up}. The container executes services setup, preparation, indexing, and sample queries. For a long-lived master container after success, set \texttt{STAY\_ALIVE\_AFTER\_PIPELINE=1} in \texttt{.env}.
 
 \subsection{Screenshots}
-Add PNG or PDF files under \texttt{report/figures/} in this project (or upload the same files to the \texttt{figures} folder in Overleaf). Suggested mapping from a local folder such as \texttt{/Users/\dots/Desktop/bd\_screens}: rename or copy into \texttt{figures/} using the filenames below so the build succeeds.
+Upload PNG or PDF files into \texttt{figures/} (Overleaf) or copy into \texttt{report/figures/} locally. Expected basenames (no extension in \verb|\figortext|): \texttt{fig01\_\dots} through \texttt{fig08\_\dots}. If a file is missing, a framed placeholder is shown so the PDF still builds.
+
+From \texttt{Desktop/bd\_screens} you can start with: \texttt{docker\_start.png} $\rightarrow$ \texttt{fig01\_services\_hdfs.png}; \texttt{HFDS.png} $\rightarrow$ \texttt{fig02\_prepare\_data.png}; \texttt{search\_results\_of\_deeplearning.png} $\rightarrow$ \texttt{fig05\_search\_query1.png}; \texttt{completed\_pipeline.png} $\rightarrow$ \texttt{fig08\_pipeline\_complete.png}. Add the remaining figures when available.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{fig01_services_hdfs}
-  \caption{Hadoop/YARN (and optional HDFS report) after \texttt{start-services.sh}.}
+  \figortext{fig01_services_hdfs}{Add screenshot}{fig01\_services\_hdfs.png}
+  \caption{Cluster / Docker startup or early Hadoop services (e.g.\ \texttt{docker compose up}, NameNode UI).}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{fig02_prepare_data}
-  \caption{Data preparation: document count and HDFS upload to \texttt{/data}.}
+  \figortext{fig02_prepare_data}{Add screenshot}{fig02\_prepare\_data.png}
+  \caption{Data preparation and HDFS: documents under \texttt{/data} or preparation log output.}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{fig03_mapreduce}
+  \figortext{fig03_mapreduce}{Add screenshot}{fig03\_mapreduce.png}
   \caption{MapReduce job completion and sample lines from \texttt{/indexer/output}.}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{fig04_cassandra_load}
-  \caption{Cassandra: keyspace/tables and load confirmation from \texttt{app.py} / \texttt{store\_index.sh}.}
+  \figortext{fig04_cassandra_load}{Add screenshot}{fig04\_cassandra\_load.png}
+  \caption{Cassandra load: \texttt{app.py} / \texttt{store\_index.sh} confirmation.}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{fig05_search_query1}
-  \caption{Search results for an example query (e.g.\ ``machine learning'').}
+  \figortext{fig05_search_query1}{Add screenshot}{fig05\_search\_query1.png}
+  \caption{Search results for an example query (e.g.\ ``machine learning'' or ``deep learning'').}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{fig06_search_query2}
+  \figortext{fig06_search_query2}{Add screenshot}{fig06\_search\_query2.png}
   \caption{Second query (e.g.\ ``artificial intelligence'').}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{fig07_yarn_or_spark_ui}
-  \caption{Optional: YARN ResourceManager or Spark UI showing a finished job.}
+  \figortext{fig07_yarn_or_spark_ui}{Add screenshot}{fig07\_yarn\_or\_spark\_ui.png}
+  \caption{Optional: YARN ResourceManager (\texttt{:8088}) or Spark UI (\texttt{:4040}).}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{fig08_pipeline_complete}
-  \caption{End of \texttt{app.sh}: pipeline complete banner.}
+  \figortext{fig08_pipeline_complete}{Add screenshot}{fig08\_pipeline\_complete.png}
+  \caption{End of \texttt{app.sh}: pipeline complete.}
 \end{figure}
 
 \subsection{Reflection}
