@@ -1,6 +1,9 @@
 */kaggle.json
 *.parquet
 .venv.tar.gz
+app/spark-conf/
+app/data/
+app/indexer_input.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

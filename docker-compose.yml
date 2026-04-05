@@ -1,5 +1,6 @@
 services:
   cluster-master:
+    platform: linux/amd64
     image: firasj/spark-docker-cluster
     container_name: cluster-master
     ports:
@@ -18,32 +19,29 @@ services:
     hostname: cluster-master
     tty: true
     working_dir: /app
-    # You can comment the entrypoint to run the script manually inside the container
+    environment:
+      - STAY_ALIVE_AFTER_PIPELINE=${STAY_ALIVE_AFTER_PIPELINE:-0}
     entrypoint: 
       - bash
       - /app/app.sh
     
   cluster-slave-1:
+    platform: linux/amd64
     image: firasj/spark-docker-cluster
     container_name: cluster-slave-1
     networks:
       - spark-cluster
     hostname: cluster-slave-1
     tty: true
-  # cluster-slave-2:
-  #   image: firasj/spark-docker-cluster
-  #   container_name: cluster-slave-2
-  #   networks:
-  #     - spark-cluster
-  #   depends_on:
-  #     - cluster-slave-1
-  #   hostname: cluster-slave-2
-  #   tty: true
   cassandra-server:
     image: cassandra
     container_name: cassandra-server
     ports:
-      - "7000:7000"
+      - "7010:7000"
+    environment:
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=100M
+    mem_limit: 2g
     networks:
       - spark-cluster
     

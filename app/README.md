@@ -32,7 +32,7 @@ A Python file to write PySpark app that will process a user's query and retrieve
 This file contains all Python depenedencies that are needed for running the programs in this repository. This file is read by pip when installing the dependencies in `app.sh` script.
 
 ### search.sh
-This script will be responsible for running the `query.py` PySpark app on Hadoop YARN cluster.
+Runs `query.py` (default Spark `local[1]`; set `USE_YARN=1` for YARN after `start-services.sh` has created `spark-conf/yarn-archive.conf`).
 
 
 ### start-services.sh

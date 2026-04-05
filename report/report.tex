@@ -1,0 +1,126 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\geometry{margin=2.5cm}
+\graphicspath{{figures/}}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+
+\title{Assignment 2: Simple Search Engine\\MapReduce, Cassandra, and Spark}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This report describes a batch indexer built with Hadoop MapReduce, storage in Apache Cassandra, and query-time ranking with BM25 using a small PySpark driver in \texttt{query.py}. Documents are prepared from a Wikipedia parquet extract with PySpark, indexed to HDFS, loaded into Cassandra, and searched from the command line.
+\end{abstract}
+
+\section{Methodology}
+
+\subsection{Overview}
+The pipeline has four stages: (1)~data preparation with PySpark, (2)~inverted-index construction with Hadoop streaming, (3)~loading the index and document statistics into Cassandra, and (4)~retrieval and BM25 ranking when the user runs \texttt{search.sh}.
+
+\subsection{Data preparation}
+\texttt{prepare\_data.py} reads \texttt{a.parquet} (columns \texttt{id}, \texttt{title}, \texttt{text}), samples a fixed number of rows, writes one UTF-8 plain-text file per document under \texttt{data/} with names of the form \texttt{<doc\_id>\_<title>.txt} (sanitized), and builds \texttt{indexer\_input.txt} with tab-separated lines \texttt{doc\_id}, \texttt{title}, \texttt{text} for the MapReduce job. \texttt{prepare\_data.sh} runs this with Spark in local mode and uploads \texttt{data/*.txt} to HDFS \texttt{/data} and the combined file to \texttt{/indexer/input/}.
+
+\subsection{Indexing (MapReduce)}
+A single streaming job (\texttt{mapper1.py}, \texttt{reducer1.py}) reads the combined input, tokenizes text, emits postings, and reduces them to one inverted-index line per term. Output is stored under HDFS \texttt{/indexer/output} and copied to \texttt{/indexer/data/index} for loading. \texttt{create\_index.sh} accepts an optional HDFS path argument; the default is \texttt{/indexer/input/indexer\_input.txt}.
+
+\subsection{Cassandra schema}
+Keyspace \texttt{search\_engine} (SimpleStrategy, RF=1) holds:
+\begin{itemize}
+  \item \texttt{inverted\_index(term, document\_frequency, num\_docs, postings\_data)} --- vocabulary and postings (serialized posting list per term).
+  \item \texttt{documents(doc\_id, title, doc\_length)} --- metadata for display and length normalization.
+  \item \texttt{statistics(key, value)} --- corpus-level values such as \texttt{num\_docs} and \texttt{avg\_doc\_length} for BM25.
+\end{itemize}
+\texttt{app.py} creates the schema and loads rows from the HDFS index file.
+
+\subsection{BM25 ranking}
+Query terms are tokenized consistently with indexing. For each term $t$, document frequency $\mathrm{df}(t)$ and postings yield term frequency per document. The implementation uses the standard BM25 idf variant and scoring function with hyperparameters $k_1 = 1.5$ and $b = 0.75$:
+\begin{equation}
+\mathrm{IDF}(t) = \log\frac{N - \mathrm{df}(t) + 0.5}{\mathrm{df}(t) + 0.5}
+\end{equation}
+\begin{equation}
+\mathrm{BM25}(t,d) = \mathrm{IDF}(t) \cdot
+\frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1\left(1 - b + b\,\dfrac{|d|}{\mathrm{avgdl}}\right)}
+\end{equation}
+where $N$ is the corpus size, $f(t,d)$ term frequency in $d$, $|d|$ document length, and $\mathrm{avgdl}$ average document length. Scores for all query terms are summed; the top 10 documents by score are returned with id and title.
+
+\subsection{Spark usage in \texttt{query.py}}
+The grader-facing search logic uses the Cassandra driver for I/O; a minimal SparkContext is started to satisfy the requirement of involving the Spark API (e.g.\ a trivial RDD action) while keeping latency low for small corpora. For a fully distributed deployment, \texttt{search.sh} supports \texttt{USE\_YARN=1} with the YARN jar archive prepared in \texttt{start-services.sh}.
+
+\section{Demonstration}
+
+\subsection{How to run}
+Place \texttt{a.parquet} in \texttt{app/}. From the repository root run \texttt{docker compose up}. The container executes services setup, preparation, indexing, and sample queries. For a long-lived master container after success, set \texttt{STAY\_ALIVE\_AFTER\_PIPELINE=1} in \texttt{.env}.
+
+\subsection{Screenshots}
+Add PNG or PDF files under \texttt{report/figures/} in this project (or upload the same files to the \texttt{figures} folder in Overleaf). Suggested mapping from a local folder such as \texttt{/Users/\dots/Desktop/bd\_screens}: rename or copy into \texttt{figures/} using the filenames below so the build succeeds.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{fig01_services_hdfs}
+  \caption{Hadoop/YARN (and optional HDFS report) after \texttt{start-services.sh}.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{fig02_prepare_data}
+  \caption{Data preparation: document count and HDFS upload to \texttt{/data}.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{fig03_mapreduce}
+  \caption{MapReduce job completion and sample lines from \texttt{/indexer/output}.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{fig04_cassandra_load}
+  \caption{Cassandra: keyspace/tables and load confirmation from \texttt{app.py} / \texttt{store\_index.sh}.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{fig05_search_query1}
+  \caption{Search results for an example query (e.g.\ ``machine learning'').}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{fig06_search_query2}
+  \caption{Second query (e.g.\ ``artificial intelligence'').}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{fig07_yarn_or_spark_ui}
+  \caption{Optional: YARN ResourceManager or Spark UI showing a finished job.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{fig08_pipeline_complete}
+  \caption{End of \texttt{app.sh}: pipeline complete banner.}
+\end{figure}
+
+\subsection{Reflection}
+Rankings depend on token overlap, document length, and corpus statistics. Short queries with frequent terms may return many ties; inspecting \texttt{[DEBUG]} lines on stderr helps verify $N$, average length, and parsed query terms. Any discrepancy between the number of parquet rows sampled and rows successfully loaded into Cassandra should be noted here if observed in your run logs.
+
+\section*{References}
+\small
+\begin{itemize}
+  \item Course handout / template: \url{https://github.com/firas-jolha/big-data-assignment2}
+  \item BM25 background: \url{https://en.wikipedia.org/wiki/Okapi_BM25}
+  \item TF-IDF and BM25 primer: \url{https://www.ai-bites.net/tf-idf-and-bm25-for-rag-a-complete-guide/}
+\end{itemize}
+
+\end{document}
