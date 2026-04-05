@@ -36,5 +36,9 @@ See `app/README.md` for per-file notes.
 ## Report
 
 - Source: `report/report.tex` (set your name; adjust reflection if needed).
-- Screenshots in `report/figures/` as `fig01_services_hdfs.png` … `fig08_pipeline_complete.png` (or `.pdf`). Missing files show as placeholders in the PDF. Quick map from `~/Desktop/bd_screens`: `docker_start.png` → `fig01_services_hdfs.png`; `HFDS.png` → `fig02_prepare_data.png`; `search_results_of_deeplearning.png` → `fig05_search_query1.png`; `completed_pipeline.png` → `fig08_pipeline_complete.png`.
+- **Four screenshots only:** upload into Overleaf folder `figures/` with the **same filenames** as on your machine, e.g. from `~/Desktop/bd_screens`:
+  - `docker_start.png`
+  - `HFDS.png`
+  - `search_results_of_deeplearning.png`
+  - `completed_pipeline.png`
 - Build: `cd report && pdflatex report.tex`, or upload `report.tex` + `figures/` to Overleaf. Submit `report.pdf` per course requirements.
