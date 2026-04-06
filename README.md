@@ -17,9 +17,6 @@ docker compose up
 
 The `cluster-master` container runs `app/app.sh`: starts Hadoop/YARN, installs Python deps, runs `prepare_data.sh`, `index.sh`, and example `search.sh` queries.
 
-Optional: copy `.env.example` to `.env` and set `STAY_ALIVE_AFTER_PIPELINE=1` so the master container keeps running after the pipeline (useful for `docker exec` and screenshots).
-
-## Scripts (minimal layout)
 
 | Path | Role |
 |------|------|
