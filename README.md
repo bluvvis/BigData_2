@@ -31,14 +31,5 @@ Optional: copy `.env.example` to `.env` and set `STAY_ALIVE_AFTER_PIPELINE=1` so
 | `app/query.py`, `search.sh` | BM25 search; `search.sh "your query"` |
 | `app/start-services.sh` | HDFS/YARN/HistoryServer + Spark-on-YARN jar archive helper |
 
-See `app/README.md` for per-file notes.
 
-## Report
 
-- Source: `report/report.tex` (set your name; adjust reflection if needed).
-- **Four screenshots only:** upload into Overleaf folder `figures/` with the **same filenames** as on your machine, e.g. from `~/Desktop/bd_screens`:
-  - `docker_start.png`
-  - `HFDS.png`
-  - `search_results_of_deeplearning.png`
-  - `completed_pipeline.png`
-- Build: `cd report && pdflatex report.tex`, or upload `report.tex` + `figures/` to Overleaf. Submit `report.pdf` per course requirements.
