@@ -1,7 +1,7 @@
 # Big Data Assignment 2 — Simple search engine (MapReduce, Cassandra, Spark)
 
 Template: [firas-jolha/big-data-assignment2](https://github.com/firas-jolha/big-data-assignment2).  
-Dataset: [Wikipedia parquet on Kaggle](https://www.kaggle.com/datasets/jjinho/wikipedia-20230701?select=a.parquet) — place `a.parquet` in `app/` before running.
+Dataset: [Wikipedia parquet on Kaggle](https://www.kaggle.com/datasets/jjinho/wikipedia-20230701?select=a.parquet) 
 
 ## Prerequisites
 
